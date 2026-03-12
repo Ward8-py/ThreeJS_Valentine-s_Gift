@@ -6,53 +6,21 @@
     <title>Nour's Valentines</title>
     <style>
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-        :root {
-            --pink:        #ff007f;
-            --purple:      #a200ff;
-            --white-10:    rgba(255,255,255,0.10);
-            --white-15:    rgba(255,255,255,0.15);
-            --white-40:    rgba(255,255,255,0.40);
-            --white-50:    rgba(255,255,255,0.50);
-            --black-40:    rgba(0,0,0,0.40);
-            --black-60:    rgba(0,0,0,0.60);
-            --black-95:    rgba(0,0,0,0.95);
-            --blur:        blur(15px);
-            --transition:  0.3s ease;
-        }
-
+        :root { --pink: #ff007f; --purple: #a200ff; --blur: blur(15px); }
         html, body {
-            width: 100%; height: 100%;
-            overflow: hidden;
+            width: 100%; height: 100%; overflow: hidden;
             background: radial-gradient(circle at center, #111 0%, #000 100%);
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            user-select: none;
-            color: #fff;
+            user-select: none; color: #fff;
         }
-
-        /* ── Render layers ── */
-        #canvas-container {
-            position: fixed; inset: 0; z-index: 1;
-            width: 100vw; height: 100vh;
-        }
-        #canvas-container canvas {
-            display: block; width: 100% !important; height: 100% !important;
-        }
-        #hand-canvas {
-            position: fixed; inset: 0;
-            width: 100vw; height: 100vh;
-            z-index: 5; pointer-events: none;
-        }
+        #canvas-container { position: fixed; inset: 0; z-index: 1; }
+        #canvas-container canvas { display: block; width: 100% !important; height: 100% !important; }
+        #hand-canvas { position: fixed; inset: 0; width: 100vw; height: 100vh; z-index: 5; pointer-events: none; }
         video { display: none; }
-
-        /* ── Overlay ── */
         #overlay {
-            position: fixed; inset: 0;
-            background: var(--black-95); z-index: 101;
-            display: flex; flex-direction: column;
-            align-items: center; justify-content: center;
-            text-align: center; padding: 0 20px;
-            transition: opacity 0.8s;
+            position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 101;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            text-align: center; padding: 0 20px; transition: opacity 0.8s;
         }
         #overlay h1 { font-weight: 300; letter-spacing: 5px; margin-bottom: 10px; line-height: 1.4; }
         #overlay .subtitle { font-size: 0.9rem; opacity: 0.7; }
@@ -61,93 +29,84 @@
             background: linear-gradient(45deg, var(--pink), var(--purple));
             border: none; border-radius: 30px; color: #fff; cursor: pointer;
             text-transform: uppercase; letter-spacing: 2px;
-            box-shadow: 0 0 30px rgba(255,0,127,0.4); transition: var(--transition);
+            box-shadow: 0 0 30px rgba(255,0,127,0.4); transition: 0.3s;
         }
         #start-btn:hover { transform: scale(1.05); box-shadow: 0 0 50px rgba(162,0,255,0.6); }
-
-        /* ── Shape indicator ── */
         #shape-indicator {
             position: fixed; top: 40px; left: 50%; transform: translateX(-50%);
-            z-index: 10; font-size: 1.2rem; letter-spacing: 4px;
-            text-transform: uppercase; opacity: 0; transition: opacity 0.5s;
-            text-shadow: 0 0 10px rgba(255,255,255,0.5); pointer-events: none;
+            z-index: 10; font-size: 1.2rem; letter-spacing: 4px; text-transform: uppercase;
+            opacity: 0; transition: opacity 0.5s; text-shadow: 0 0 10px rgba(255,255,255,0.5); pointer-events: none;
         }
-
-        /* ── Message box ── */
         #message-box {
             position: fixed; top: 25px; right: 25px; width: 240px; padding: 20px;
-            background: rgba(255,255,255,0.08); backdrop-filter: var(--blur);
-            -webkit-backdrop-filter: var(--blur);
-            border: 1px solid var(--white-15); border-radius: 20px;
-            z-index: 100; box-shadow: 0 10px 30px var(--black-40);
+            background: rgba(255,255,255,0.08); backdrop-filter: var(--blur); -webkit-backdrop-filter: var(--blur);
+            border: 1px solid rgba(255,255,255,0.15); border-radius: 20px;
+            z-index: 100; box-shadow: 0 10px 30px rgba(0,0,0,0.4);
             pointer-events: none; text-align: center;
             opacity: 0; transform: translateX(50px);
-            transition: opacity 0.6s cubic-bezier(0.175,0.885,0.32,1.275),
-                        transform 0.6s cubic-bezier(0.175,0.885,0.32,1.275);
+            transition: opacity 0.6s cubic-bezier(0.175,0.885,0.32,1.275), transform 0.6s cubic-bezier(0.175,0.885,0.32,1.275);
         }
         #message-box.visible { opacity: 1; transform: translateX(0); }
-        #message-text {
-            font-size: 0.95rem; line-height: 1.5; font-weight: 300;
-            letter-spacing: 0.5px; font-style: italic;
-            text-shadow: 0 2px 10px var(--black-40);
-        }
-
-        /* ── Side menu ── */
+        #message-text { font-size: 0.95rem; line-height: 1.5; font-weight: 300; letter-spacing: 0.5px; font-style: italic; }
         #glass-menu {
             position: fixed; top: 50%; left: 30px; transform: translateY(-50%);
             background: rgba(20,20,20,0.4); border-radius: 20px;
-            border: 1px solid var(--white-10); backdrop-filter: var(--blur);
+            border: 1px solid rgba(255,255,255,0.1); backdrop-filter: var(--blur);
             padding: 20px; display: flex; flex-direction: column; gap: 15px;
-            z-index: 10; box-shadow: 0 10px 40px var(--black-40);
-            opacity: 0; transition: opacity 1s;
+            z-index: 10; box-shadow: 0 10px 40px rgba(0,0,0,0.4); opacity: 0; transition: opacity 1s;
         }
-        .menu-title {
-            color: var(--white-50); font-size: 0.75rem;
-            letter-spacing: 2px; text-transform: uppercase;
-            text-align: center; margin-bottom: 5px;
-        }
+        .menu-title { color: rgba(255,255,255,0.5); font-size: 0.75rem; letter-spacing: 2px; text-transform: uppercase; text-align: center; margin-bottom: 5px; }
         .glass-btn {
-            background: var(--white-10); border: 1px solid var(--white-10);
+            background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
             color: #fff; padding: 12px 20px; border-radius: 10px; cursor: pointer;
-            font-size: 0.9rem; letter-spacing: 1px; transition: all var(--transition); text-align: left;
+            font-size: 0.9rem; letter-spacing: 1px; transition: all 0.3s; text-align: left;
         }
         .glass-btn:hover { background: rgba(255,255,255,0.15); transform: translateX(5px); border-color: rgba(255,0,127,0.5); }
-
-        /* ── HUD ── */
         #ui {
             position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%);
-            background: var(--black-60); padding: 15px 30px; border-radius: 50px;
-            border: 1px solid var(--white-10); backdrop-filter: blur(10px);
-            display: flex; gap: 20px; z-index: 10; pointer-events: none;
-            opacity: 0; transition: opacity 1s;
+            background: rgba(0,0,0,0.6); padding: 15px 30px; border-radius: 50px;
+            border: 1px solid rgba(255,255,255,0.1); backdrop-filter: blur(10px);
+            display: flex; gap: 20px; z-index: 10; pointer-events: none; opacity: 0; transition: opacity 1s;
         }
         .hud-item {
-            font-size: 0.75rem; text-transform: uppercase;
-            display: flex; align-items: center; gap: 6px;
-            font-weight: 600; letter-spacing: 1px;
-            color: var(--white-40); transition: color 0.3s, text-shadow 0.3s;
+            font-size: 0.75rem; text-transform: uppercase; display: flex; align-items: center;
+            gap: 6px; font-weight: 600; letter-spacing: 1px; color: rgba(255,255,255,0.4);
+            transition: color 0.3s, text-shadow 0.3s;
         }
         .hud-item.active-gesture { color: var(--pink); text-shadow: 0 0 15px rgba(255,0,127,0.8); }
+
+        #cam-prompt {
+            display: none; /* switched to flex by JS */
+            position: fixed; bottom: 110px; left: 50%; transform: translateX(-50%);
+            background: rgba(255,0,127,0.12); border: 1px solid rgba(255,0,127,0.35);
+            backdrop-filter: blur(10px); border-radius: 14px;
+            padding: 14px 24px; z-index: 20; gap: 12px; flex-wrap: wrap;
+            align-items: center; justify-content: center;
+            color: #fff; font-size: 0.82rem; letter-spacing: 0.5px;
+            text-align: center; max-width: 400px;
+            box-shadow: 0 0 30px rgba(255,0,127,0.15);
+        }
+        #cam-prompt span { opacity: 0.85; line-height: 1.6; }
+        #cam-allow-btn {
+            background: linear-gradient(45deg, var(--pink), var(--purple));
+            border: none; border-radius: 20px; color: #fff;
+            padding: 8px 20px; cursor: pointer; font-size: 0.8rem;
+            letter-spacing: 1px; white-space: nowrap; transition: 0.3s; margin-top: 4px;
+        }
+        #cam-allow-btn:hover { transform: scale(1.05); }
     </style>
 </head>
 <body>
 
-    <!-- Overlay -->
     <div id="overlay">
         <h1>WILL YOU BE MY VALENTINES?</h1>
         <div class="subtitle">pls</div>
         <button id="start-btn">Yes</button>
     </div>
 
-    <!-- Shape name indicator -->
     <div id="shape-indicator"></div>
+    <div id="message-box"><div id="message-text">You own my heart</div></div>
 
-    <!-- Romantic quote box -->
-    <div id="message-box">
-        <div id="message-text">You own my heart</div>
-    </div>
-
-    <!-- Side menu -->
     <div id="glass-menu">
         <div class="menu-title">Manual Override</div>
         <button class="glass-btn" data-shape="heart">Heart</button>
@@ -157,7 +116,6 @@
         <button class="glass-btn" data-shape="sphere">Sphere</button>
     </div>
 
-    <!-- HUD -->
     <div id="ui">
         <div id="ind-swipe"  class="hud-item">Left Hand: Rotate</div>
         <div id="ind-fist"   class="hud-item">Fist: Morph</div>
@@ -165,7 +123,12 @@
         <div id="ind-blink"  class="hud-item">Right Fist: Colour</div>
     </div>
 
-    <!-- Render targets -->
+    <!-- Camera permission notice -->
+    <div id="cam-prompt">
+        <span>📷 Allow camera for hand gesture controls. Manual buttons work without it.</span>
+        <button id="cam-allow-btn" onclick="requestCamPermission()">Allow Camera</button>
+    </div>
+
     <div id="canvas-container"></div>
     <canvas id="hand-canvas"></canvas>
     <video id="input_video" autoplay muted playsinline></video>
@@ -184,15 +147,332 @@
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
 
-    <!-- App modules (order matters) -->
-    <script src="js/config.js"></script>
-    <script src="js/shaders.js"></script>
-    <script src="js/generators.js"></script>
-    <script src="js/scene.js"></script>
-    <script src="js/particles.js"></script>
-    <script src="js/gestures.js"></script>
-    <script src="js/ui.js"></script>
-    <script src="js/main.js"></script>
+    <script>
+    // ── Config ────────────────────────────────────────────────
+    const CONFIG = Object.freeze({
+        particleCount: 25000,
+        camZ: 350,
+        sensitivity: { rotate: 1.75 },
+        physics: { friction: 0.90 },
+        shapes: ['heart', 'saturn', 'rose', 'fireworks', 'sphere'],
+    });
+    const ROMANCE_QUOTES = Object.freeze({
+        heart:     "You own my heart",
+        saturn:    "All these stars and I get lost in your eyes only",
+        rose:      "Every thought leads back to you",
+        fireworks: "I love you beyond comprehension",
+        sphere:    "With you everything feels complete",
+    });
 
+    // ── Shaders ───────────────────────────────────────────────
+    const VERTEX_SHADER = `
+        uniform float time; uniform float mixVal; uniform float scale;
+        uniform float crumbleAmt; uniform vec3 colorShift; uniform float beatIntensity;
+        attribute vec3 positionB; attribute float size; attribute vec3 color;
+        varying vec3 vColor; varying float vAlpha;
+        float hash(vec3 p) { return fract(sin(dot(p, vec3(12.9898,78.233,45.164))) * 4325.5453); }
+        void main() {
+            vec3 pos = mix(position, positionB, mixVal);
+            pos *= 1.0 + sin(time * 3.0) * 0.06 * beatIntensity;
+            pos += (vec3(hash(pos), hash(pos.zyx), hash(pos.yxz)) * 2.0 - 1.0) * crumbleAmt * 120.0;
+            vec4 mv = modelViewMatrix * vec4(pos * scale, 1.0);
+            gl_Position = projectionMatrix * mv;
+            gl_PointSize = (size + crumbleAmt * 4.0) * (400.0 / -mv.z) * scale;
+            vColor = mod(color + colorShift, 1.0);
+            vAlpha = smoothstep(800.0, 50.0, -mv.z);
+        }
+    `;
+    const FRAGMENT_SHADER = `
+        varying vec3 vColor; varying float vAlpha;
+        void main() {
+            vec2 c = gl_PointCoord - 0.5;
+            if (length(c) > 0.5) discard;
+            gl_FragColor = vec4(vColor, pow(1.0 - length(c)*2.0, 2.5) * vAlpha * 0.9);
+        }
+    `;
+
+    // ── Shape generators ──────────────────────────────────────
+    const Generators = {
+        heart() {
+            while (true) {
+                const x=(Math.random()-0.5)*3, y=(Math.random()-0.5)*3, z=(Math.random()-0.5)*3;
+                const a = x*x + 2.25*z*z + y*y - 1;
+                if (a*a*a - x*x*y*y*y - 0.1125*z*z*y*y*y <= 0 && a*a*a - x*x*y*y*y - 0.1125*z*z*y*y*y > -0.2)
+                    return new THREE.Vector3(x*85, y*85, z*85);
+            }
+        },
+        saturn() {
+            if (Math.random() > 0.3) {
+                const r=55*Math.cbrt(Math.random()), t=Math.random()*Math.PI*2, p=Math.acos(2*Math.random()-1);
+                return new THREE.Vector3(r*Math.sin(p)*Math.cos(t), r*Math.sin(p)*Math.sin(t), r*Math.cos(p));
+            }
+            const a=Math.random()*Math.PI*2, r=90+Math.random()*60;
+            return new THREE.Vector3(Math.cos(a)*r, (Math.random()-0.5)*2, Math.sin(a)*r);
+        },
+        rose() {
+            const r=Math.random()*90, t=r*0.5;
+            return new THREE.Vector3(r*Math.cos(t), (Math.random()-0.5)*r*0.5+Math.pow(r/90,2)*30-15, r*Math.sin(t));
+        },
+        fireworks() {
+            const r=Math.random()>0.8?Math.random()*110:110, t=Math.random()*Math.PI*2, p=Math.acos(2*Math.random()-1);
+            return new THREE.Vector3(r*Math.sin(p)*Math.cos(t), r*Math.sin(p)*Math.sin(t), r*Math.cos(p));
+        },
+        sphere() {
+            const r=85*Math.cbrt(Math.random()), t=Math.random()*Math.PI*2, p=Math.acos(2*Math.random()-1);
+            return new THREE.Vector3(r*Math.sin(p)*Math.cos(t), r*Math.sin(p)*Math.sin(t), r*Math.cos(p));
+        },
+    };
+
+    // ── Scene globals ─────────────────────────────────────────
+    let camera, scene, renderer, composer;
+    let _particleSystem, _uniforms, _currentShapeIdx = 0;
+    const shapeBuffers = {};
+    let STATE;
+    let _isMorphing = false, _morphTimer = 0;
+
+    const HAND_CONNECTIONS = [[0,1],[1,2],[2,3],[3,4],[0,5],[5,6],[6,7],[7,8],[5,9],[9,10],[10,11],[11,12],[9,13],[13,14],[14,15],[15,16],[13,17],[0,17],[17,18],[18,19],[19,20]];
+
+    // ── Boot (runs on button click only) ─────────────────────
+    document.getElementById('start-btn').addEventListener('click', function() {
+
+        // Dismiss overlay
+        const overlay = document.getElementById('overlay');
+        overlay.style.opacity = '0';
+        setTimeout(() => { overlay.style.display = 'none'; }, 800);
+        document.getElementById('ui').style.opacity = '1';
+        document.getElementById('glass-menu').style.opacity = '1';
+        document.getElementById('message-box').classList.add('visible');
+
+        // Init STATE (THREE is loaded by now)
+        STATE = {
+            lastHandPos: new THREE.Vector2(0,0), velocity: new THREE.Vector2(0,0),
+            manualRotX: 0, manualRotY: 0, currentScale: 1.0, lastPinchDist: null,
+            autoRotY: 0, autoRotSpeed: 0.001, leftFist: false,
+        };
+
+        // Scene
+        scene = new THREE.Scene();
+        scene.fog = new THREE.FogExp2(0x000000, 0.0015);
+        camera = new THREE.PerspectiveCamera(60, innerWidth/innerHeight, 0.1, 2000);
+        camera.position.z = CONFIG.camZ;
+        renderer = new THREE.WebGLRenderer({ antialias: false, powerPreference: 'high-performance' });
+        renderer.setSize(innerWidth, innerHeight);
+        renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+        document.getElementById('canvas-container').appendChild(renderer.domElement);
+
+        // Post-processing
+        const comp = new THREE.EffectComposer(renderer);
+        const ap = new THREE.AfterimagePass(); ap.uniforms['damp'].value = 0.65;
+        const bp = new THREE.UnrealBloomPass(new THREE.Vector2(innerWidth/2, innerHeight/2), 1.5, 0.4, 0.85);
+        bp.threshold = 0; bp.strength = 1.0; bp.radius = 0.3;
+        comp.addPass(new THREE.RenderPass(scene, camera));
+        comp.addPass(ap); comp.addPass(bp);
+        composer = comp;
+
+        // Stars
+        const sp = [];
+        for (let i=0;i<3000;i++) {
+            const r=300+Math.random()*700, t=Math.random()*Math.PI*2, p=Math.acos(2*Math.random()-1);
+            sp.push(r*Math.sin(p)*Math.cos(t), r*Math.sin(p)*Math.sin(t), r*Math.cos(p));
+        }
+        const sg = new THREE.BufferGeometry();
+        sg.setAttribute('position', new THREE.Float32BufferAttribute(sp, 3));
+        window._sf = new THREE.Points(sg, new THREE.PointsMaterial({color:0xffffff,size:1.5,transparent:true,opacity:0.5,fog:false}));
+        scene.add(window._sf);
+
+        // Particles
+        const N = CONFIG.particleCount;
+        const positions=new Float32Array(N*3), posB=new Float32Array(N*3), sizes=new Float32Array(N), colors=new Float32Array(N*3);
+        const ci=new THREE.Color(0xff0055), co=new THREE.Color(0xff99bb);
+        CONFIG.shapes.forEach(name => {
+            const b=new Float32Array(N*3);
+            for(let i=0;i<N;i++){const v=Generators[name]();b[i*3]=v.x;b[i*3+1]=v.y;b[i*3+2]=v.z;}
+            shapeBuffers[name]=b;
+        });
+        const hb=shapeBuffers['heart'];
+        for(let i=0;i<N;i++){
+            positions[i*3]=hb[i*3];positions[i*3+1]=hb[i*3+1];positions[i*3+2]=hb[i*3+2];
+            sizes[i]=Math.random()*3.5+2.0;
+            const d=Math.sqrt(hb[i*3]**2+hb[i*3+1]**2+hb[i*3+2]**2)/85;
+            const m=ci.clone().lerp(co,d);
+            colors[i*3]=m.r;colors[i*3+1]=m.g;colors[i*3+2]=m.b;
+        }
+        const geo=new THREE.BufferGeometry();
+        geo.setAttribute('position',new THREE.BufferAttribute(positions,3));
+        geo.setAttribute('positionB',new THREE.BufferAttribute(posB,3));
+        geo.setAttribute('size',new THREE.BufferAttribute(sizes,1));
+        geo.setAttribute('color',new THREE.BufferAttribute(colors,3));
+        _uniforms={
+            time:{value:0},mixVal:{value:0},scale:{value:1},crumbleAmt:{value:0},
+            beatIntensity:{value:1},colorShift:{value:new THREE.Vector3(0,0,0)},
+        };
+        _particleSystem=new THREE.Points(geo,new THREE.ShaderMaterial({
+            uniforms:_uniforms,vertexShader:VERTEX_SHADER,fragmentShader:FRAGMENT_SHADER,
+            transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,
+        }));
+        scene.add(_particleSystem);
+
+        // Resize hand canvas
+        const hc=document.getElementById('hand-canvas');
+        hc.width=innerWidth; hc.height=innerHeight;
+
+        // Animation loop
+        (function animate(){
+            requestAnimationFrame(animate);
+            _uniforms.time.value=performance.now()*0.001;
+            if(Math.abs(STATE.velocity.x)>0.001||Math.abs(STATE.velocity.y)>0.001) STATE.autoRotSpeed=0;
+            else STATE.autoRotSpeed=THREE.MathUtils.lerp(STATE.autoRotSpeed,0.001,0.02);
+            STATE.autoRotY+=STATE.autoRotSpeed;
+            STATE.manualRotY+=STATE.velocity.x; STATE.manualRotX+=STATE.velocity.y;
+            STATE.velocity.x*=CONFIG.physics.friction; STATE.velocity.y*=CONFIG.physics.friction;
+            _particleSystem.rotation.y=STATE.autoRotY+STATE.manualRotY;
+            _particleSystem.rotation.x=STATE.manualRotX;
+            if(window._sf) window._sf.rotation.y=STATE.autoRotY*0.5;
+            composer.render();
+        })();
+
+        // Hand tracking
+        const video=document.getElementById('input_video');
+        const hCtx=hc.getContext('2d');
+        const hudFist=document.getElementById('ind-fist'), hudZoom=document.getElementById('ind-zoom');
+        const hudSwipe=document.getElementById('ind-swipe'), hudBlink=document.getElementById('ind-blink');
+
+        // Request camera permission explicitly — if denied, silently skip hand tracking
+        navigator.mediaDevices.getUserMedia({ video: true })
+        .then(() => {
+            const hands=new Hands({locateFile:f=>`https://cdn.jsdelivr.net/npm/@mediapipe/hands/${f}`});
+            hands.setOptions({maxNumHands:2,modelComplexity:0,minDetectionConfidence:0.5,minTrackingConfidence:0.5,selfieMode:true});
+            hands.onResults(results=>{
+                hCtx.clearRect(0,0,hc.width,hc.height);
+                [hudFist,hudZoom,hudSwipe,hudBlink].forEach(e=>e.classList.remove('active-gesture'));
+                if(!results.multiHandLandmarks?.length){
+                    STATE.lastHandPos.set(0,0);
+                    if(_isMorphing){_isMorphing=false;_morphTimer=0;gsap.to(_uniforms.crumbleAmt,{value:0,duration:1});}
+                    return;
+                }
+                const count=results.multiHandLandmarks.length;
+                if(count===2){
+                    hudZoom.classList.add('active-gesture');
+                    const w1=results.multiHandLandmarks[0][9],w2=results.multiHandLandmarks[1][9];
+                    const dist=Math.hypot(w1.x-w2.x,w1.y-w2.y);
+                    if(STATE.lastPinchDist!==null){
+                        STATE.currentScale+=(dist-STATE.lastPinchDist)*5;
+                        STATE.currentScale=THREE.MathUtils.clamp(STATE.currentScale,0.4,3.5);
+                        gsap.to(_uniforms.scale,{value:STATE.currentScale,duration:0.1});
+                    }
+                    STATE.lastPinchDist=dist;
+                } else STATE.lastPinchDist=null;
+
+                let anyRot=false,anyFist=false;
+                for(let i=0;i<count;i++){
+                    const lm=results.multiHandLandmarks[i];
+                    const isLeft=results.multiHandedness[i].label==='Right';
+                    const fist=lm[8].y>lm[5].y&&lm[12].y>lm[9].y&&lm[16].y>lm[13].y&&lm[20].y>lm[17].y;
+                    const W=hc.width,H=hc.height;
+                    hCtx.strokeStyle=isLeft?'rgba(255,0,127,0.4)':'rgba(0,255,136,0.4)';
+                    hCtx.fillStyle=isLeft?'rgba(255,0,127,0.8)':'rgba(0,255,136,0.8)';
+                    hCtx.lineWidth=2; hCtx.beginPath();
+                    HAND_CONNECTIONS.forEach(([a,b])=>{hCtx.moveTo(lm[a].x*W,lm[a].y*H);hCtx.lineTo(lm[b].x*W,lm[b].y*H);});
+                    hCtx.stroke();
+                    lm.forEach(pt=>{hCtx.beginPath();hCtx.arc(pt.x*W,pt.y*H,3,0,Math.PI*2);hCtx.fill();});
+                    if(isLeft){
+                        if(fist&&!STATE.leftFist){STATE.leftFist=true;hudBlink.classList.add('active-gesture');}
+                        else if(!fist&&STATE.leftFist){
+                            STATE.leftFist=false;hudBlink.classList.add('active-gesture');
+                            gsap.to(_uniforms.colorShift.value,{x:Math.random(),y:Math.random(),z:Math.random(),duration:0.6});
+                        }
+                    } else {
+                        if(fist){
+                            anyFist=true;hudFist.classList.add('active-gesture');
+                            if(!_isMorphing){_isMorphing=true;gsap.to(_uniforms.crumbleAmt,{value:1,duration:0.8});}
+                            if(++_morphTimer>20){
+                                _morphTimer=0;
+                                _currentShapeIdx=(_currentShapeIdx+1)%CONFIG.shapes.length;
+                                triggerMorph(CONFIG.shapes[_currentShapeIdx]);
+                            }
+                            STATE.lastHandPos.set(0,0);
+                        } else {
+                            anyRot=true;hudSwipe.classList.add('active-gesture');
+                            if(_isMorphing){_isMorphing=false;_morphTimer=0;gsap.to(_uniforms.crumbleAmt,{value:0,duration:1.5,ease:'elastic.out(1,0.5)'});}
+                            if(STATE.lastHandPos.x!==0){
+                                STATE.velocity.x=(lm[8].x-STATE.lastHandPos.x)*CONFIG.sensitivity.rotate;
+                                STATE.velocity.y=(lm[8].y-STATE.lastHandPos.y)*CONFIG.sensitivity.rotate;
+                            }
+                            STATE.lastHandPos.set(lm[8].x,lm[8].y);
+                        }
+                    }
+                }
+                if(!anyFist&&_isMorphing){_isMorphing=false;_morphTimer=0;gsap.to(_uniforms.crumbleAmt,{value:0,duration:1.5,ease:'elastic.out(1,0.5)'});}
+                if(!anyRot) STATE.lastHandPos.set(0,0);
+            });
+            // Ask for camera permission explicitly before handing to MediaPipe.
+        // On denial, show a friendly notice — manual buttons still work fine.
+        navigator.mediaDevices.getUserMedia({ video: true })
+            .then(stream => {
+                stream.getTracks().forEach(t => t.stop()); // release test stream
+                new Camera(video, { onFrame: async () => { await hands.send({ image: video }); }, width: 640, height: 480 }).start();
+                document.getElementById('cam-prompt').style.display = 'none';
+            })
+            .catch(() => {
+                const cp = document.getElementById('cam-prompt');
+                cp.style.display = 'flex';
+            });
+        })
+        .catch(() => {
+            // Camera denied — hide the gesture HUD hints, everything else keeps working
+            document.getElementById('ui').style.display = 'none';
+        });
+
+        window.addEventListener('resize',()=>{
+            if(!camera)return;
+            camera.aspect=innerWidth/innerHeight; camera.updateProjectionMatrix();
+            renderer.setSize(innerWidth,innerHeight); composer.setSize(innerWidth,innerHeight);
+            hc.width=innerWidth; hc.height=innerHeight;
+        });
+    });
+
+    // ── Morph helper (also used by menu buttons) ──────────────
+    function triggerMorph(name) {
+        if(!_particleSystem) return;
+        const geom=_particleSystem.geometry;
+        if(_uniforms.mixVal.value>0.5){geom.setAttribute('position',geom.attributes.positionB.clone());_uniforms.mixVal.value=0;}
+        geom.attributes.positionB.set(shapeBuffers[name]);
+        geom.attributes.positionB.needsUpdate=true;
+        gsap.killTweensOf(_uniforms.beatIntensity);
+        gsap.to(_uniforms.beatIntensity,{value:name==='heart'?1:0,duration:1});
+        gsap.killTweensOf(_uniforms.mixVal);
+        gsap.to(_uniforms.mixVal,{value:1,duration:1.5,ease:'power2.inOut'});
+        const ind=document.getElementById('shape-indicator');
+        ind.innerText=name.toUpperCase(); ind.style.opacity='1';
+        setTimeout(()=>{ind.style.opacity='0';},2000);
+        document.getElementById('message-text').innerText=ROMANCE_QUOTES[name]||'';
+        document.getElementById('message-box').classList.add('visible');
+    }
+
+    document.querySelectorAll('.glass-btn[data-shape]').forEach(btn=>{
+        btn.addEventListener('click',()=>triggerMorph(btn.dataset.shape));
+    });
+
+    // Re-request camera when user clicks Allow in the prompt
+    function requestCamPermission() {
+        const video = document.getElementById('input_video');
+        const hc    = document.getElementById('hand-canvas');
+        navigator.mediaDevices.getUserMedia({ video: true })
+            .then(stream => {
+                stream.getTracks().forEach(t => t.stop());
+                document.getElementById('cam-prompt').style.display = 'none';
+
+                const hands = new Hands({ locateFile: f => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${f}` });
+                hands.setOptions({ maxNumHands:2, modelComplexity:0, minDetectionConfidence:0.5, minTrackingConfidence:0.5, selfieMode:true });
+                hands.onResults(_handleHandResults.bind(null, hc));
+                new Camera(video, { onFrame: async () => { await hands.send({ image: video }); }, width: 640, height: 480 }).start();
+            })
+            .catch(() => {
+                const btn = document.getElementById('cam-allow-btn');
+                btn.innerText = 'Blocked — allow in browser settings';
+                btn.style.background = 'rgba(255,100,100,0.4)';
+            });
+    }
+    </script>
 </body>
 </html>
