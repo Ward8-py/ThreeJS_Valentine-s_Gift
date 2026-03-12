@@ -1,0 +1,253 @@
+
+*, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+:root {
+    --pink:        #ff007f;
+    --purple:      #a200ff;
+    --green:       #00ff88;
+    --white-10:    rgba(255, 255, 255, 0.10);
+    --white-15:    rgba(255, 255, 255, 0.15);
+    --white-40:    rgba(255, 255, 255, 0.40);
+    --white-50:    rgba(255, 255, 255, 0.50);
+    --black-40:    rgba(0,   0,   0,   0.40);
+    --black-60:    rgba(0,   0,   0,   0.60);
+    --black-95:    rgba(0,   0,   0,   0.95);
+    --blur:        blur(15px);
+    --radius-pill: 50px;
+    --radius-card: 20px;
+    --radius-btn:  10px;
+    --transition:  0.3s ease;
+}
+
+body {
+    overflow: hidden;
+    background: radial-gradient(circle at center, #111 0%, #000 100%);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    user-select: none;
+    color: #fff;
+}
+
+/* ─────────────────────────────────────────────
+   Render Layers
+───────────────────────────────────────────── */
+#canvas-container {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+}
+
+#hand-canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100vh;
+    z-index: 5;
+    pointer-events: none;
+}
+
+video {
+    display: none;
+}
+
+/* ─────────────────────────────────────────────
+   Overlay (Start Screen)
+───────────────────────────────────────────── */
+#overlay {
+    position: absolute;
+    inset: 0;
+    background: var(--black-95);
+    z-index: 101;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 0 20px;
+    transition: opacity 0.8s;
+}
+
+#overlay h1 {
+    font-weight: 300;
+    letter-spacing: 5px;
+    margin-bottom: 10px;
+    line-height: 1.4;
+}
+
+#overlay .subtitle {
+    font-size: 0.9rem;
+    opacity: 0.7;
+}
+
+#start-btn {
+    margin-top: 20px;
+    padding: 15px 40px;
+    font-size: 1.2rem;
+    background: linear-gradient(45deg, var(--pink), var(--purple));
+    border: none;
+    border-radius: 30px;
+    color: #fff;
+    cursor: pointer;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    box-shadow: 0 0 30px rgba(255, 0, 127, 0.4);
+    transition: var(--transition);
+}
+
+#start-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 50px rgba(162, 0, 255, 0.6);
+}
+
+/* ─────────────────────────────────────────────
+   Shape Name Indicator
+───────────────────────────────────────────── */
+#shape-indicator {
+    position: absolute;
+    top: 40px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10;
+    font-size: 1.2rem;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    opacity: 0;
+    transition: opacity 0.5s;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+    pointer-events: none;
+}
+
+/* ─────────────────────────────────────────────
+   Romantic Quote Box
+───────────────────────────────────────────── */
+#message-box {
+    position: absolute;
+    top: 25px;
+    right: 25px;
+    width: 240px;
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: var(--blur);
+    -webkit-backdrop-filter: var(--blur);
+    border: 1px solid var(--white-15);
+    border-radius: var(--radius-card);
+    z-index: 100;
+    box-shadow: 0 10px 30px var(--black-40);
+    pointer-events: none;
+    text-align: center;
+
+    /* Hidden by default — JS adds .visible */
+    opacity: 0;
+    transform: translateX(50px);
+    transition: opacity 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275),
+                transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+#message-box.visible {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+#message-text {
+    font-size: 0.95rem;
+    line-height: 1.5;
+    font-weight: 300;
+    letter-spacing: 0.5px;
+    font-style: italic;
+    text-shadow: 0 2px 10px var(--black-40);
+}
+
+/* ─────────────────────────────────────────────
+   Side Menu
+───────────────────────────────────────────── */
+#glass-menu {
+    position: absolute;
+    top: 50%;
+    left: 30px;
+    transform: translateY(-50%);
+    background: rgba(20, 20, 20, 0.4);
+    border-radius: var(--radius-card);
+    border: 1px solid var(--white-10);
+    backdrop-filter: var(--blur);
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    z-index: 10;
+    box-shadow: 0 10px 40px var(--black-40);
+
+    /* Hidden until app starts */
+    opacity: 0;
+    transition: opacity 1s;
+}
+
+.menu-title {
+    color: var(--white-50);
+    font-size: 0.75rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    text-align: center;
+    margin-bottom: 5px;
+}
+
+.glass-btn {
+    background: var(--white-10);
+    border: 1px solid var(--white-10);
+    color: #fff;
+    padding: 12px 20px;
+    border-radius: var(--radius-btn);
+    cursor: pointer;
+    font-size: 0.9rem;
+    letter-spacing: 1px;
+    transition: all var(--transition);
+    text-align: left;
+}
+
+.glass-btn:hover {
+    background: rgba(255, 255, 255, 0.15);
+    transform: translateX(5px);
+    border-color: rgba(255, 0, 127, 0.5);
+}
+
+/* ─────────────────────────────────────────────
+   HUD Bar
+───────────────────────────────────────────── */
+#ui {
+    position: absolute;
+    bottom: 40px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--black-60);
+    padding: 15px 30px;
+    border-radius: var(--radius-pill);
+    border: 1px solid var(--white-10);
+    backdrop-filter: blur(10px);
+    display: flex;
+    gap: 20px;
+    z-index: 10;
+    pointer-events: none;
+
+    /* Hidden until app starts */
+    opacity: 0;
+    transition: opacity 1s;
+}
+
+.hud-item {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    color: var(--white-40);
+    transition: color 0.3s, text-shadow 0.3s;
+}
+
+.hud-item.active-gesture {
+    color: var(--pink);
+    text-shadow: 0 0 15px rgba(255, 0, 127, 0.8);
+}
